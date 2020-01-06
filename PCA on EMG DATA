@@ -1,0 +1,79 @@
+import numpy as np
+import pandas as pd
+from matplotlib import pyplot as py
+from mpl_toolkits.mplot3d import Axes3D
+# read data
+dataset = pd.read_csv("emgG.txt")
+# header data
+dataset.head()
+####################################
+# description of dataset features
+dataset.describe()
+X = dataset.iloc[: ,0:13]
+print(X)
+Y = dataset.iloc[: ,13]
+
+# proportion of variance
+X_std = (X - np.mean(X,axis=0))/np.std(X,axis=0)
+print(X_std)
+#####################################
+covr_matrix = np.cov(X_std , dataset[:,1])
+covr_matrix1 =np.cov(X_std , dataset[:,12])
+print("covr_matrix.shape > "+str(covr_matrix.shape))
+print("covr_matrix.shape1 > "+str(covr_matrix.shape))
+print("covariance of the matrix is : \n%s" %covr_matrix)
+
+##############
+eigenvalues , eigenvectors = np.linalg.eig(covr_matrix)
+print("np.linalg.eig(covr_matrix) > " + str(len(np.linalg.eig(covr_matrix))))
+print("the eigenvalues of the cov(x) matrix are : \n %s" %eigenvalues)
+print("\n the eigenvectors of the cov(x) matrix are : \n%s" %eigenvectors)
+
+###########################
+eig_pairs = [(eigenvalues[index] , eigenvectors[: , index]) for index in range(len(eigenvalues))]
+print("-------\n")
+print(eig_pairs)
+print("-------\n")
+eig_pairs.sort()
+eig_pairs.reverse()
+print("\n%s" %eig_pairs)
+eig_value_sorted = [eig_pairs[index][0] for index in range(len(eigenvalues))]
+eig_vector_sorted = [eig_pairs[index][1] for index in range(len(eigenvalues))]
+print("Eigen values in sorted : \n%s" %eig_value_sorted)
+print("Respective eigen vectors are : \n%s" %eig_vector_sorted)
+print("*******\n")
+print(eig_pairs.size())
+print("*******\n")
+
+# Distribution Varience plot
+prop_vari = np.cumsum(eig_value_sorted)/sum(eig_value_sorted)
+print("commutative proportion of variance : \n%s" %prop_vari)
+num_comp = range(1 , len(eig_value_sorted)+1)
+py.title("commutative proportion of variance and principal components")
+#py.xlable("principal components")
+#py.ylable("commutative proportion of variance")
+py.scatter(num_comp , prop_vari)
+py.show()
+#dimentionality reduction
+PCA_reduced = np.array(eig_vector_sorted[0:2]).transpose()
+proj_data = np.dot(X_std , PCA_reduced)
+print(proj_data)
+
+##########################
+negative = py.scatter(proj_data[: , 0][Y==0] , proj_data[: ,1][Y==0])
+positive = py.scatter(proj_data[: , 0][Y==1] , proj_data[: ,1][Y==1] , color ='red')
+py.title("PCA dimensionality reduction into 2D")
+py.legend([negative , positive] , ["EMG" , "ARTIFACT"])
+py.show()
+###########
+fig = py.figure()
+ax = Axes3D(fig)
+negative = py.scatter(proj_data_3D[: , 0][Y==0] ,proj_data_3D[: , 1][Y==0] , proj_data_3D[: , 2][Y==0])
+positive = py.scatter(proj_data_3D[: , 0][Y==1] , proj_data_3D[: , 1][Y==1] , proj_data_3D[: , 2][Y==1] , color ="red")
+ax.set_title("PCA reduced data to 3D")
+py.legend([negative , positive] , ["EMG" , "ARTIFACTS"])
+py.show()
+###
+PCA_reduced = np.array(eig_vector_sorted[0:3]).transpose()
+proj_data_3D = np.dot(X_std , PCA_reduced)
+print(proj_data_3D)
