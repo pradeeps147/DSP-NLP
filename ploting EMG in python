@@ -1,0 +1,29 @@
+import os
+import csv
+import numpy as np
+import scipy.io
+
+from matplotlib import pyplot as plt
+from collections import defaultdict
+import matplotlib.pyplot as plt
+from scipy import signal
+from sklearn.decomposition import FastICA, PCA
+
+
+emg_channel = defaultdict(list)
+with open('xyz.txt') as f:
+    reader = csv.reader(f)
+    #reader.next()
+    for row in reader:
+        for (i,v) in enumerate(row):
+            emg_channel[i].append(float(v))
+plt.figure()           
+plt.plot(emg_channel[0])   
+#plt.title(name)
+plt.xlabel('samples')
+plt.ylabel('voltage(microV)')
+#for the next column
+plt.xlabel('samples')
+plt.ylabel('voltage(microV)')
+plt.plot(emg_channel[1]
+# and so on you can plot n numbers of the plot with data
